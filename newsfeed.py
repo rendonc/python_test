@@ -28,8 +28,6 @@ url="https://news.google.com/"
 dname="logs/"
 fname=dname+"news.html"
 
-exist=os.access(dname,os.F_OK)
-
 if not os.access(dname,os.F_OK):
   os.mkdir(dname)
 
