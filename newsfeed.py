@@ -3,47 +3,42 @@ import os
 import time
 import sys
 
+
 def scrapWebpage(url,fileName,diffName):
   text=None
   with requests.get(url) as resp:
     text=resp.text
   
-  prev=None
   with open(fileName,"r",encoding=resp.encoding) as f:
-      prev=f.read()
-
-  position=0
-  diff,data,pos=dataCompare(prev,text)
-  
+    diff,data,pos=dataCompare(f,text)
+      
   if(diff):
     with open(fname,"w",encoding=resp.encoding) as f:
       print("difference detected at position: "+str(pos))
       print("writing new feed to file...")
       f.write(resp.text)
     with open(diffName,"w",encoding=resp.encoding) as f:
-      f.write(data)
+      if(data is not None):
+        f.write(data)
 
-    
-def dataCompare(prev,new):
-
-  len1=len(prev)
-
-  len2=len(new)
-    
-  size=0
-  if(len1>len2):
-    size=len2
-  else:
-    size=len1
-  
-  if(size==0):
-    return True, new, 0
-  
-  for i in range(0,size):
-    if(prev[i]!=new[i]):
-      return True, new[i:],i
+      
+def dataCompare(dataFile,newData):
+  pos=0
+  #newData=newData.splitlines( )
+  for prev in dataFile:
+    size=len(prev)
+    new=newData[pos:size]
+    pos+=size
+    if prev and prev is not new:
+      for index, item in enumerate(new):
+        if prev[index]!=item:
+          return True, prev[0:index], index
+          
+  if(pos==0):
+    return True, None, pos
   print("no difference detected...")
-  return False,"",-1
+  return False,None,-1
+
   
   
 url="https://news.google.com/"
@@ -82,10 +77,12 @@ except IOError as e:
   print("Error while opening file: "+fname)
   print(e)
   exit()
-except:
-  e = sys.exc_info()[0]
+except Exception as e:
   print("Error while scrapping site: "+url)
   print(e)
 finally:
   exit()
   
+  
+
+
