@@ -1,7 +1,7 @@
 import requests
 import os
 import time
-
+import sys
 
 def scrapWebpage(url,fileName,diffName):
   text=None
