@@ -1,43 +1,86 @@
 import requests
 import os
 import time
-import difflib
 
-def scrapWebpage(url,fileName):
+
+def scrapWebpage(url,fileName,diffName):
+  text=None
   with requests.get(url) as resp:
     text=resp.text
-    with open(fileName,"r",encoding=resp.encoding) as f:
+  
+  prev=None
+  with open(fileName,"r",encoding=resp.encoding) as f:
       prev=f.read()
-      dataCompare(prev,text)
-    
-  with open(fname,"w",encoding=resp.encoding) as f:
-    print("writing to file...")
-    f.write(resp.text)
-    
-def dataCompare(prev,new):
-  # initiate the Differ object
-  d = difflib.Differ()
- 
-  # calculate the difference between the two texts
-  diff = d.compare(prev, new)
 
-  # output the result
-  print ('\n'.join(diff))
+  diff,data=dataCompare(prev,text)
 
+  if(diff):  
+    with open(fname,"w",encoding=resp.encoding) as f:
+      print("writing new feed to file...")
+      f.write(resp.text)
+      
+    with open(diffName,"w",encoding=resp.encoding) as f:
+      f.write(data)
+
+    
+def dataCompare(prev,new,fname):
+  len1=len(prev)
+  len2=len(new)
+  
+  size=0
+  if(len1>len2):
+    size=len2
+  else:
+    size=len1
+    
+  for i in range(0,size):
+    if(prev[i]!=new[i]):
+      print("difference detected...")
+      return True, new[i:]
+  print("no difference detected...")
+  return False;
+  
+  
 url="https://news.google.com/"
 dname="logs/"
 fname=dname+"news.html"
+diffname=dname+"diff.txt"
 
 if not os.access(dname,os.F_OK):
-  os.mkdir(dname)
-
+  try:
+    os.mkdir(dname)
+  except IOError as e:
+    print("Error while creating directory; please, verify paths and permissions: "+dname)
+    print(e.errno)
+    print(e)
+    exit()
+     
 if not os.access(fname,os.F_OK):
-  with open(fname,"w") as f:
-    pass
-
-
-for i in range(10):
-  scrapWebpage(url,fname)
-  time.sleep(2)
-
-
+  fp=None
+  try:
+    fp = open(fname,"w")
+  except IOError as e:
+    print("Error while opening file; please, verify paths and permissions: "+fname)
+    print(e.errno)
+    print(e)
+    exit()
+  finally: 
+    fp.close()
+  
+  
+try:  
+  while True:
+    scrapWebpage(url,fname,diffname)
+    print("Thread sleeping..")
+    time.sleep(5)
+except IOError as e:
+  print("Error while opening file: "+fname)
+  print(e)
+  exit()
+except:
+  e = sys.exc_info()[0]
+  print("Error while scrapping site: "+url)
+  print(e)
+finally:
+  exit()
+  
