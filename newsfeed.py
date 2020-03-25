@@ -36,6 +36,9 @@ def dataCompare(prev,new):
   else:
     size=len1
   
+  if(size==0):
+    return True, new, 0
+  
   for i in range(0,size):
     if(prev[i]!=new[i]):
       return True, new[i:],i
