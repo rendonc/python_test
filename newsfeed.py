@@ -23,7 +23,7 @@ def scrapWebpage(url,fileName,diffName):
       f.write(data)
 
     
-def dataCompare(prev,new,fname):
+def dataCompare(prev,new):
   len1=len(prev)
   len2=len(new)
   
