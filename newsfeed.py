@@ -24,7 +24,7 @@ def scrapWebpage(url,fileName,diffName):
       
 def dataCompare(dataFile,newData):
   pos=0
-  #newData=newData.splitlines( )
+ 
   for prev in dataFile:
     size=len(prev)
     new=newData[pos:size]
