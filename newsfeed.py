@@ -12,33 +12,35 @@ def scrapWebpage(url,fileName,diffName):
   with open(fileName,"r",encoding=resp.encoding) as f:
       prev=f.read()
 
-  diff,data=dataCompare(prev,text)
-
-  if(diff):  
+  position=0
+  diff,data,pos=dataCompare(prev,text)
+  
+  if(diff):
     with open(fname,"w",encoding=resp.encoding) as f:
+      print("difference detected at position: "+str(pos))
       print("writing new feed to file...")
       f.write(resp.text)
-      
     with open(diffName,"w",encoding=resp.encoding) as f:
       f.write(data)
 
     
 def dataCompare(prev,new):
+
   len1=len(prev)
+
   len2=len(new)
-  
+    
   size=0
   if(len1>len2):
     size=len2
   else:
     size=len1
-    
+  
   for i in range(0,size):
     if(prev[i]!=new[i]):
-      print("difference detected...")
-      return True, new[i:]
+      return True, new[i:],i
   print("no difference detected...")
-  return False;
+  return False,"",-1
   
   
 url="https://news.google.com/"
