@@ -10,11 +10,11 @@ def scrapWebpage(url,fileName,diffName):
     text=resp.text
   
   with open(fileName,"r",encoding=resp.encoding) as f:
-    diff,data,pos=dataCompare(f,text)
+    diff,data,pos,line=dataCompare(f,text)
       
   if(diff):
     with open(fname,"w",encoding=resp.encoding) as f:
-      print("difference detected at position: "+str(pos))
+      print("difference detected at line: "+str(line)+" position: "+str(pos))
       print("writing new feed to file...")
       f.write(resp.text)
     with open(diffName,"w",encoding=resp.encoding) as f:
@@ -24,24 +24,29 @@ def scrapWebpage(url,fileName,diffName):
       
 def dataCompare(dataFile,newData):
   pos=0
- 
+  line=1
+  
   for prev in dataFile:
     size=len(prev)
-    new=newData[pos:size]
+    new=newData[pos:pos+size]
+    
     pos+=size
     if prev and prev is not new:
       for index, item in enumerate(new):
         if prev[index]!=item:
-          return True, prev[0:index], index
+          return True, newData[0:pos], index,line
+    line+=1
           
   if(pos==0):
-    return True, None, pos
+    return True, None, pos, line
+  
   print("no difference detected...")
-  return False,None,-1
+  return False,None,-1, line
 
-  
-  
-url="https://news.google.com/"
+    
+#url="https://news.google.com/"
+url="https://raw.githubusercontent.com/rendonc/python_test/master/newsfeed.py"
+
 dname="logs/"
 fname=dname+"news.html"
 diffname=dname+"diff.txt"
@@ -83,6 +88,3 @@ except Exception as e:
 finally:
   exit()
   
-  
-
-
